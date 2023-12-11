@@ -87,3 +87,60 @@ def d8_p2():
         result.append(v[0][0])
 
     return math.lcm(*result)
+
+
+def get_extrapolated_number(row, extrapolation_end):
+
+    if extrapolation_end:
+        number_position = -1
+    else:
+        number_position = 0
+    
+    list_data = row.split(" ")
+
+    array_data = np.array([int(x) for x in list_data if len(x) > 0], dtype=np.int64)
+    last_data_point = np.array([], dtype=np.int64)
+
+    all_zeros = False
+    counter = 0
+    while not all_zeros:
+        new_np = np.array([array_data[x+1] - array_data[x] for x in range(len(array_data)-1)], dtype=np.int64)
+        last_data_point = np.append(last_data_point, array_data[number_position])
+        if set(new_np) != set([0]):
+            array_data = new_np
+            all_zeros = False
+        else:
+            all_zeros = True
+
+        counter += 1
+        if counter % 100 == 0:
+            print(counter, array_data)
+
+    last_data_point = last_data_point[::-1]
+
+    extrapolated_number = 0
+    for v in last_data_point:
+
+        if extrapolation_end:
+            extrapolated_number = v + extrapolated_number
+        else:
+            extrapolated_number = v - extrapolated_number
+
+    return extrapolated_number
+
+
+def d9_p1():
+    data = get_data(9)
+    result = 0 
+    for row in data:
+        result += get_extrapolated_number(row, extrapolation_end=True)
+
+    return result
+
+def d9_p2():
+    data = get_data(9)
+    result = 0 
+    for row in data:
+        result += get_extrapolated_number(row, extrapolation_end=False)
+
+    return result
